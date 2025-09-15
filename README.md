@@ -66,4 +66,4 @@ By the end of this project, you will have:
 ---
 
 ## 👨‍💻 Author
-This project is part of your **final lab assignment** in building AI-powered applications.  
+This project is part of my **final lab assignment** in building AI-powered applications.  
