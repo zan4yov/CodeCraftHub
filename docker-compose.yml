@@ -1,0 +1,41 @@
+# ./docker-compose.yml
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: ums_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 }).ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: ums_app
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      # Your app already reads process.env.PORT and process.env.MONGO_URI
+      PORT: "5000"
+      # IMPORTANT: use the *service name* "mongo" as hostname inside the network
+      MONGO_URI: "mongodb://mongo:27017/usermngtservice"
+      NODE_ENV: "production"
+    ports:
+      - "5000:5000"
+    # Optional for live-editing during dev:
+    # volumes:
+    #   - .:/usr/src/app
+    #   - /usr/src/app/node_modules
+    restart: unless-stopped
+    command: node src/server.js
+
+volumes:
+  mongo-data:
